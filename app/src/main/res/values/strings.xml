@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ZMService</string>
+    <string name="loading">Đang tải về</string>
+
+    <string name="link128">128</string>
+    <string name="link320">320</string>
+    <string name="linkLossless">Lossless</string>
+
+    <string name="failure">Tải thất bại, vui lòng thử lại sau!</string>
+    <string name="copy_right">Copy Right HTSI - @2016</string>
+    <string name="storage">Bài hát đã lưu - Thư mục: </string>
+</resources>
