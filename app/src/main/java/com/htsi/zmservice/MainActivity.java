@@ -1,5 +1,6 @@
 package com.htsi.zmservice;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -7,7 +8,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -42,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.contentInfo)
     View contentInfo;
 
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
+
     private SongInfo mSongInfo;
 
     @Override
@@ -51,23 +58,62 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
         getIntentData();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                // get the icon's location on screen to pass through to the search screen
+                View searchMenuView = mToolbar.findViewById(R.id.menu_search);
+                int[] loc = new int[2];
+                searchMenuView.getLocationOnScreen(loc);
+                startActivityForResult(SearchActivity.createStartIntent(this, loc[0], loc[0] +
+                        (searchMenuView.getWidth() / 2)), 0, ActivityOptions
+                        .makeSceneTransitionAnimation(this).toBundle());
+                searchMenuView.setAlpha(0f);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 0:
+                // reset the search icon which we hid
+                View searchMenuView = mToolbar.findViewById(R.id.menu_search);
+                if (searchMenuView != null) {
+                    searchMenuView.setAlpha(1f);
+                }
+                break;
+        }
+    }
+
     private void getIntentData() {
-        Intent intent = getIntent();
+        /*Intent intent = getIntent();
         String encodedSongId;
         if (intent.getExtras() != null) {
             String mSongURL = intent.getExtras().getString(Intent.EXTRA_TEXT);
             if (mSongURL != null) {
-                encodedSongId = mSongURL.replaceFirst(".*/([^/?]+).*", "$1").replace(".html", "");
+                encodedSongId = mSongURL.replaceFirst(".*//*([^/?]+).*", "$1").replace(".html", "");
                 Log.d("HTSI", encodedSongId);
                 getSongData(encodedSongId);
             }
         } else {
-            encodedSongId = "ZW7OZ668";
-            getSongData(encodedSongId);
-        }
+
+        }*/
+        getSongData("ZW7OZ668");
     }
 
     private void getSongData(String encodedSongId) {
@@ -80,11 +126,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response<SongInfo> response, Retrofit retrofit) {
                 mSongInfo = response.body();
-
                 pbLoading.setVisibility(View.GONE);
                 Log.d("HTSI", ServiceGenerator.IMAGE_BASE_URL + mSongInfo.getThumbnail());
-                tvTitle.setText(mSongInfo.getTitle());
-                tvArtist.setText(mSongInfo.getArtist());
                 new AsyncTask<String, Void, Bitmap>() {
 
                     @Override
@@ -108,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
                             Palette.from(bitmap).generate(paletteAsyncListener);
                             imgCover.setImageBitmap(bitmap);
                         }
+                        tvTitle.setText(mSongInfo.getTitle());
+                        tvArtist.setText(mSongInfo.getArtist());
+                        contentInfo.setVisibility(View.VISIBLE);
                     }
                 }.execute(ServiceGenerator.IMAGE_BASE_URL + mSongInfo.getThumbnail());
             }

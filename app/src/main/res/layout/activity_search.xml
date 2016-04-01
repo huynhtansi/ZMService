@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2015 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<FrameLayout
+    android:id="@+id/container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <View
+        android:id="@+id/scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scrim"/>
+
+    <FrameLayout
+        android:id="@+id/search_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:outlineProvider="bounds"
+        android:theme="@style/SearchViewTheme"
+        android:fitsSystemWindows="true"
+        >
+
+        <View
+            android:id="@+id/search_background"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:alpha="0"
+            android:background="@color/background_dark"/>
+
+        <SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/padding_normal"
+            android:alpha="0"
+            android:iconifiedByDefault="false" />
+
+        <FrameLayout
+            android:id="@+id/searchback_container"
+            android:layout_width="96dp"
+            android:layout_height="match_parent"
+            android:paddingStart="4dp"
+            android:background="@android:color/transparent">
+
+            <ImageButton
+                android:id="@+id/searchback"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_search_24dp" />
+        </FrameLayout>
+
+    </FrameLayout>
+
+</FrameLayout>
