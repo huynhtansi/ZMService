@@ -8,6 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/loading"
+        android:progressTint="@color/primary"
         android:layout_gravity="center"/>
 
     <LinearLayout
@@ -61,8 +62,7 @@
                 android:id="@+id/btnLink128"
                 android:layout_below="@id/artist"
                 android:layout_marginTop="8dp"
-                android:text="@string/link128"
-                android:onClick="onDownloadButtonClick"/>
+                android:text="@string/link128"/>
 
             <android.support.v7.widget.AppCompatButton
                 android:layout_width="wrap_content"
@@ -71,8 +71,7 @@
                 android:layout_below="@id/artist"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
-                android:text="@string/link320"
-                android:onClick="onDownloadButtonClick"/>
+                android:text="@string/link320"/>
 
             <android.support.v7.widget.AppCompatButton
                 android:layout_width="wrap_content"
@@ -82,8 +81,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentRight="true"
-                android:text="@string/linkLossless"
-                android:onClick="onDownloadButtonClick"/>
+                android:text="@string/linkLossless"/>
 
 
 

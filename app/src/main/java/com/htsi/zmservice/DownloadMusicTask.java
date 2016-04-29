@@ -45,6 +45,7 @@ public class DownloadMusicTask extends AsyncTask<String, Integer, String> {
     protected String doInBackground(String... params) {
 
         URL url;
+
         try {
             url = new URL(params[0]);
             URLConnection connection = url.openConnection();
@@ -110,8 +111,8 @@ public class DownloadMusicTask extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+        dialog.dismiss();
         if (s != null) {
-            dialog.dismiss();
             Toast.makeText(context, context.getString(R.string.storage) + s, Toast.LENGTH_LONG).show();
             ((Activity)context).finish();
         } else {

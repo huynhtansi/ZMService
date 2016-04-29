@@ -1,13 +1,19 @@
 package com.htsi.zmservice;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -48,6 +55,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
+
+    @Bind(R.id.btnLink128)
+    AppCompatButton mBtnLink128;
+
+    @Bind(R.id.btnLink320)
+    AppCompatButton mBtnLink320;
+
+    @Bind(R.id.btnLinkLossless)
+    AppCompatButton mBtnLinkLossless;
 
     private SongInfo mSongInfo;
 
@@ -101,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getIntentData() {
-        /*Intent intent = getIntent();
+        Intent intent = getIntent();
         String encodedSongId;
         if (intent.getExtras() != null) {
             String mSongURL = intent.getExtras().getString(Intent.EXTRA_TEXT);
@@ -111,9 +127,8 @@ public class MainActivity extends AppCompatActivity {
                 getSongData(encodedSongId);
             }
         } else {
-
-        }*/
-        getSongData("ZW7OZ668");
+            getSongData("ZW7OZ668");
+        }
     }
 
     private void getSongData(String encodedSongId) {
@@ -127,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Response<SongInfo> response, Retrofit retrofit) {
                 mSongInfo = response.body();
                 pbLoading.setVisibility(View.GONE);
-                Log.d("HTSI", ServiceGenerator.IMAGE_BASE_URL + mSongInfo.getThumbnail());
                 new AsyncTask<String, Void, Bitmap>() {
 
                     @Override
@@ -156,6 +170,10 @@ public class MainActivity extends AppCompatActivity {
                         contentInfo.setVisibility(View.VISIBLE);
                     }
                 }.execute(ServiceGenerator.IMAGE_BASE_URL + mSongInfo.getThumbnail());
+                mBtnLink128.setEnabled(mSongInfo.getLinkDown().getLink128() != null);
+                mBtnLink320.setEnabled(mSongInfo.getLinkDown().getLink320() != null);
+                mBtnLinkLossless.setEnabled(mSongInfo.getLinkDown().getLinklossless() != null);
+                verifyStoragePermissions(MainActivity.this);
             }
 
             @Override
@@ -171,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @OnClick({R.id.btnLink128, R.id.btnLink320, R.id.btnLinkLossless})
     public void onDownloadButtonClick(View view) {
         switch (view.getId()) {
             case R.id.btnLink128:
@@ -188,4 +207,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param pContext
+     */
+    public static void verifyStoragePermissions(Context pContext) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(pContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    (Activity)pContext,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 }
