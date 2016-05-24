@@ -16,6 +16,7 @@ public class ServiceGenerator {
 
     public static final String IMAGE_BASE_URL = "http://image.mp3.zdn.vn/";
 
+    private static final String API_BASE_URL_SEARCH  = "http://ac.mp3.zing.vn";
 
     private static OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -25,8 +26,19 @@ public class ServiceGenerator {
                     .addConverterFactory(GsonConverterFactory.create())
             ;
 
-    public static <S> S createService(Class<S> serviceClass) {
-        Retrofit retrofit = builder.client(okHttpClient).build();
+    private static Retrofit.Builder builderSearch =
+            new Retrofit.Builder()
+                    .baseUrl(API_BASE_URL_SEARCH)
+                    .addConverterFactory(GsonConverterFactory.create())
+            ;
+
+    public static <S> S createService(Class<S> serviceClass, boolean search) {
+        Retrofit retrofit;
+        if (search) {
+            retrofit = builderSearch.client(okHttpClient).build();
+        } else {
+            retrofit = builder.client(okHttpClient).build();
+        }
         return retrofit.create(serviceClass);
     }
 }

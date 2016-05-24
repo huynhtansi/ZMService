@@ -20,6 +20,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     >
 
     <View
@@ -34,21 +35,19 @@
         android:layout_height="wrap_content"
         android:outlineProvider="bounds"
         android:theme="@style/SearchViewTheme"
-        android:fitsSystemWindows="true"
-        >
+        android:fitsSystemWindows="true">
 
         <View
             android:id="@+id/search_background"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:alpha="0"
-            android:background="@color/background_dark"/>
+            android:background="@color/scrim"/>
 
         <SearchView
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/padding_normal"
             android:alpha="0"
             android:iconifiedByDefault="false" />
 
@@ -57,6 +56,7 @@
             android:layout_width="96dp"
             android:layout_height="match_parent"
             android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:background="@android:color/transparent">
 
             <ImageButton
@@ -70,4 +70,60 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/results_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?android:actionBarSize"
+        android:background="@color/scrim"
+        android:elevation="4dp">
+
+        <ProgressBar
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="64dp"
+            android:paddingBottom="64dp"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:indeterminateTint="?android:colorAccent"
+            android:indeterminateTintMode="src_in" />
+
+        <ViewStub
+            android:id="@+id/stub_no_search_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout="@layout/no_search_results" />
+
+        <ListView
+            android:id="@+id/search_results"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:scrollbarThumbVertical="@color/accent"
+            android:scrollbarSize="2dp"
+            android:divider="@null"
+            android:visibility="gone" />
+
+        <!--<ImageButton
+            android:id="@+id/fab"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:elevation="@dimen/z_fab"
+            android:background="@drawable/fab"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="@dimen/padding_normal"
+            android:layout_marginBottom="@dimen/padding_normal"
+            android:stateListAnimator="@animator/raise"
+            android:src="@drawable/ic_save_24dp"
+            android:visibility="gone" />-->
+
+        <View
+            android:id="@+id/results_scrim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/scrim"
+            android:visibility="gone" />
+
+    </FrameLayout>
 </FrameLayout>

@@ -9,11 +9,17 @@ import com.google.gson.annotations.SerializedName;
  */
 public class SongInfo {
 
+    @SerializedName("id")
+    private String id;
+
     @SerializedName("song_id")
     private String songId;
 
     @SerializedName("title")
     private String title;
+
+    @SerializedName("name")
+    private String name;
 
     @SerializedName("artist")
     private String artist;
@@ -45,6 +51,14 @@ public class SongInfo {
 
     public String getSongId() {
         return songId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public class LinkDown {

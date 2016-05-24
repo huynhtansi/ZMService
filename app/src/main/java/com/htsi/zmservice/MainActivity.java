@@ -112,6 +112,12 @@ public class MainActivity extends AppCompatActivity {
                 if (searchMenuView != null) {
                     searchMenuView.setAlpha(1f);
                 }
+
+                if (resultCode == RESULT_OK) {
+                    String songId = data.getStringExtra("SongID");
+                    Log.d("ZMService", songId);
+                    getSongData(songId);
+                }
                 break;
         }
     }
@@ -134,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     private void getSongData(String encodedSongId) {
         String formattedID = "{\"id\":\"" + encodedSongId + "\"}";
 
-        ZMService zmService = ServiceGenerator.createService(ZMService.class);
+        ZMService zmService = ServiceGenerator.createService(ZMService.class, false);
         Call<SongInfo> call = zmService.getSongInfoById(formattedID);
 
         call.enqueue(new Callback<SongInfo>() {

@@ -25,29 +25,50 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.InputType;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 
 public class SearchActivity extends Activity {
 
     public static final String EXTRA_MENU_LEFT = "EXTRA_MENU_LEFT";
     public static final String EXTRA_MENU_CENTER_X = "EXTRA_MENU_CENTER_X";
+
+    @Bind(R.id.container)
+    ViewGroup mContainer;
 
     @Bind(R.id.search_view)
     SearchView mSearchView;
@@ -66,9 +87,24 @@ public class SearchActivity extends Activity {
 
     @Bind(R.id.scrim) View mScrim;
 
+    @Bind(R.id.search_results)
+    ListView mListSong;
+
+    @Bind(android.R.id.empty)
+    ProgressBar mProgressBar;
+
+    @Bind(R.id.results_container)
+    ViewGroup mResultsContainer;
+
+    BaselineGridTextView mNoResults;
+
+    private Transition auto;
 
     private int mSearchBackDistanceX;
     private int mSearchIconCenterX;
+
+    private ZMService mZMService;
+
 
     public static Intent createStartIntent(Context context, int menuIconLeft, int menuIconCenterX) {
         Intent starter = new Intent(context, SearchActivity.class);
@@ -84,6 +120,7 @@ public class SearchActivity extends Activity {
         ButterKnife.bind(this);
         setupSearchView();
 
+        mZMService = ServiceGenerator.createService(ZMService.class, true);
         // extract the search icon's location passed from the launching activity, minus 4dp to
         // compensate for different paddings in the views
         mSearchBackDistanceX = getIntent().getIntExtra(EXTRA_MENU_LEFT, 0) - (int) TypedValue
@@ -158,6 +195,16 @@ public class SearchActivity extends Activity {
         });
 
         //onNewIntent(getIntent());
+        mListSong.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SongInfo songInfo = (SongInfo) mListSong.getAdapter().getItem(position);
+                Intent intent = new Intent();
+                intent.putExtra("SongID", songInfo.getId());
+                setResult(RESULT_OK, intent);
+                dismiss();
+            }
+        });
     }
 
     private void setupSearchView() {
@@ -171,6 +218,40 @@ public class SearchActivity extends Activity {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                ImeUtils.hideIme(mSearchView);
+                mSearchView.clearFocus();
+                mListSong.setVisibility(View.GONE);
+                setNoResultsVisibility(View.GONE);
+
+                showLoading();
+                Map<String, String> options = new HashMap<>();
+                options.put("num", "100");
+                options.put("type", "song");
+                options.put("query", query);
+                Call<ListSongResponse> call = mZMService.search(options);
+                call.enqueue(new Callback<ListSongResponse>() {
+                    @Override
+                    public void onResponse(Response<ListSongResponse> response, Retrofit retrofit) {
+                        hideLoading();
+                        if (response.body() != null) {
+                            if (response.body().getResult().equals("true")) {
+                                List<SongInfo> songInfoList = response.body().getTypeSongs().get(0).getSongInfos();
+
+                                if (songInfoList == null || songInfoList.size() == 0) {
+                                    setNoResultsVisibility(View.VISIBLE);
+                                    return;
+                                }
+                                mListSong.setVisibility(View.VISIBLE);
+                                mListSong.setAdapter(new ListSongAdapter(SearchActivity.this, songInfoList));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        hideLoading();
+                    }
+                });
                 return true;
             }
 
@@ -191,10 +272,47 @@ public class SearchActivity extends Activity {
         });
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-
+    public void showLoading() {
+        TransitionManager.beginDelayedTransition(mContainer, auto);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
+
+    public void hideLoading() {
+        TransitionManager.beginDelayedTransition(mContainer, auto);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void setNoResultsVisibility(int visibility) {
+        if (visibility == View.VISIBLE) {
+            if (mNoResults == null) {
+                ViewStub viewStub = (ViewStub) findViewById(R.id.stub_no_search_results);
+                if (viewStub != null)
+                    mNoResults = (BaselineGridTextView) viewStub.inflate();
+                if (mNoResults != null) {
+                    mNoResults.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mSearchView.setQuery("", false);
+                            mSearchView.requestFocus();
+                            ImeUtils.showIme(mSearchView);
+                        }
+                    });
+                }
+            }
+            String message = String.format(getString(R
+                    .string.no_search_results), mSearchView.getQuery().toString());
+            SpannableStringBuilder ssb = new SpannableStringBuilder(message);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC),
+                    message.indexOf('“') + 1,
+                    message.length() - 1,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mNoResults.setText(ssb);
+        }
+        if (mNoResults != null) {
+            mNoResults.setVisibility(visibility);
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -252,6 +370,25 @@ public class SearchActivity extends Activity {
                     .setDuration(600L)
                     .setInterpolator(AnimUtils.getFastOutLinearInInterpolator(this))
                     .start();
+        }
+        // if we're showing search results, circular hide them
+        if (mResultsContainer.getHeight() > 0) {
+            Animator closeResults = ViewAnimationUtils.createCircularReveal(
+                    mResultsContainer,
+                    mSearchIconCenterX,
+                    0,
+                    (float) Math.hypot(mSearchIconCenterX, mResultsContainer.getHeight()),
+                    0f);
+            closeResults.setDuration(500L);
+            closeResults.setInterpolator(AnimUtils.getFastOutSlowInInterpolator(SearchActivity
+                    .this));
+            closeResults.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mResultsContainer.setVisibility(View.INVISIBLE);
+                }
+            });
+            closeResults.start();
         }
 
         // fade out the scrim
