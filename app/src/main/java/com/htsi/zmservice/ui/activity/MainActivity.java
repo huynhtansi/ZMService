@@ -1,4 +1,4 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.ui.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -22,50 +22,80 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.htsi.zmservice.R;
+import com.htsi.zmservice.models.SongInfo;
+import com.htsi.zmservice.service.DownloadMusicTask;
+import com.htsi.zmservice.service.ServiceGenerator;
+import com.htsi.zmservice.service.ZMService;
 
 import java.util.concurrent.ExecutionException;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.cover)
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    @BindView(R.id.cover)
     ImageView imgCover;
-
-    @Bind(R.id.loading)
+    @BindView(R.id.loading)
     ProgressBar pbLoading;
-
-    @Bind(R.id.title)
+    @BindView(R.id.title)
     TextView tvTitle;
-
-    @Bind(R.id.artist)
+    @BindView(R.id.artist)
     TextView tvArtist;
-
-    @Bind(R.id.contentInfo)
+    @BindView(R.id.contentInfo)
     View contentInfo;
-
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
-
-    @Bind(R.id.btnLink128)
+    @BindView(R.id.btnLink128)
     AppCompatButton mBtnLink128;
-
-    @Bind(R.id.btnLink320)
+    @BindView(R.id.btnLink320)
     AppCompatButton mBtnLink320;
-
-    @Bind(R.id.btnLinkLossless)
+    @BindView(R.id.btnLinkLossless)
     AppCompatButton mBtnLinkLossless;
-
+    Palette.PaletteAsyncListener paletteAsyncListener = new Palette.PaletteAsyncListener() {
+        @Override
+        public void onGenerated(Palette palette) {
+            contentInfo.setBackgroundColor(palette.getDarkVibrantColor(Color.BLACK));
+        }
+    };
     private SongInfo mSongInfo;
+
+    /**
+     * Checks if the app has permission to write to device storage
+     * <p/>
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param pContext Context's activity
+     */
+    public static void verifyStoragePermissions(Context pContext) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(pContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    (Activity) pContext,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getSongData(String encodedSongId) {
+        pbLoading.setVisibility(View.VISIBLE);
+
         String formattedID = "{\"id\":\"" + encodedSongId + "\"}";
 
         ZMService zmService = ServiceGenerator.createService(ZMService.class, false);
@@ -145,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<SongInfo>() {
             @Override
-            public void onResponse(Response<SongInfo> response, Retrofit retrofit) {
+            public void onResponse(Call<SongInfo> call, Response<SongInfo> response) {
                 mSongInfo = response.body();
                 pbLoading.setVisibility(View.GONE);
                 new AsyncTask<String, Void, Bitmap>() {
@@ -183,17 +215,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<SongInfo> call, Throwable t) {
+                Toast.makeText(MainActivity.this, R.string.no_song_info, Toast.LENGTH_LONG).show();
             }
         });
     }
-
-    Palette.PaletteAsyncListener paletteAsyncListener = new Palette.PaletteAsyncListener() {
-        @Override
-        public void onGenerated(Palette palette) {
-            contentInfo.setBackgroundColor(palette.getDarkVibrantColor(Color.BLACK));
-        }
-    };
 
     @OnClick({R.id.btnLink128, R.id.btnLink320, R.id.btnLinkLossless})
     public void onDownloadButtonClick(View view) {
@@ -210,35 +236,6 @@ public class MainActivity extends AppCompatActivity {
                 new DownloadMusicTask(MainActivity.this).execute(mSongInfo.getLinkDown().getLinklossless(),
                         mSongInfo.getTitle(), mSongInfo.getArtist(), mSongInfo.getSongId());
                 break;
-        }
-    }
-
-
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param pContext
-     */
-    public static void verifyStoragePermissions(Context pContext) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(pContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    (Activity)pContext,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
         }
     }
 }

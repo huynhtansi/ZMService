@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.htsi.zmservice;
+package com.htsi.zmservice.utils;
 
 import android.content.Context;
 import android.os.ResultReceiver;

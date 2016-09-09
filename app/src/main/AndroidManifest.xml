@@ -7,22 +7,30 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/ZMService"
         >
-        <activity android:name=".MainActivity" android:label=""
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:label=""
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.VIEW"/>
                 <data android:mimeType="text/plain"/>
             </intent-filter>
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>-->
         </activity>
 
         <activity
-            android:name=".SearchActivity"
+            android:name=".ui.activity.SearchActivity"
             android:launchMode="singleTop"
             android:theme="@style/ZMService.Translucent.Search">
             <intent-filter>

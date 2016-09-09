@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.htsi.zmservice;
+package com.htsi.zmservice.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -29,9 +29,10 @@ import java.util.Map;
  */
 public class FontUtil {
 
-    private FontUtil() { }
+    private static final Map<String, Typeface> sTypefaceCache = new HashMap<>();
 
-    private static final Map<String, Typeface> sTypefaceCache = new HashMap<String, Typeface>();
+    private FontUtil() {
+    }
 
     public static Typeface get(Context context, String font) {
         synchronized (sTypefaceCache) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.htsi.zmservice;
+package com.htsi.zmservice.ui.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -32,7 +32,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.InputType;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -49,17 +48,27 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
+import com.htsi.zmservice.R;
+import com.htsi.zmservice.models.SongInfo;
+import com.htsi.zmservice.models.response.ListSongResponse;
+import com.htsi.zmservice.service.ServiceGenerator;
+import com.htsi.zmservice.service.ZMService;
+import com.htsi.zmservice.ui.adapter.ListSongAdapter;
+import com.htsi.zmservice.utils.AnimUtils;
+import com.htsi.zmservice.utils.BaselineGridTextView;
+import com.htsi.zmservice.utils.ImeUtils;
+import com.htsi.zmservice.utils.ViewUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SearchActivity extends Activity {
@@ -67,33 +76,34 @@ public class SearchActivity extends Activity {
     public static final String EXTRA_MENU_LEFT = "EXTRA_MENU_LEFT";
     public static final String EXTRA_MENU_CENTER_X = "EXTRA_MENU_CENTER_X";
 
-    @Bind(R.id.container)
+    @BindView(R.id.container)
     ViewGroup mContainer;
 
-    @Bind(R.id.search_view)
+    @BindView(R.id.search_view)
     SearchView mSearchView;
 
-    @Bind(R.id.searchback_container)
+    @BindView(R.id.searchback_container)
     ViewGroup mSearchBackContainer;
 
-    @Bind(R.id.searchback)
+    @BindView(R.id.searchback)
     ImageButton mSearchBack;
 
-    @Bind(R.id.search_background)
+    @BindView(R.id.search_background)
     View mSearchBackground;
 
-    @Bind(R.id.search_toolbar)
+    @BindView(R.id.search_toolbar)
     ViewGroup mSearchToolbar;
 
-    @Bind(R.id.scrim) View mScrim;
+    @BindView(R.id.scrim)
+    View mScrim;
 
-    @Bind(R.id.search_results)
+    @BindView(R.id.search_results)
     ListView mListSong;
 
-    @Bind(android.R.id.empty)
+    @BindView(android.R.id.empty)
     ProgressBar mProgressBar;
 
-    @Bind(R.id.results_container)
+    @BindView(R.id.results_container)
     ViewGroup mResultsContainer;
 
     BaselineGridTextView mNoResults;
@@ -231,7 +241,7 @@ public class SearchActivity extends Activity {
                 Call<ListSongResponse> call = mZMService.search(options);
                 call.enqueue(new Callback<ListSongResponse>() {
                     @Override
-                    public void onResponse(Response<ListSongResponse> response, Retrofit retrofit) {
+                    public void onResponse(Call<ListSongResponse> call, Response<ListSongResponse> response) {
                         hideLoading();
                         if (response.body() != null) {
                             if (response.body().getResult().equals("true")) {
@@ -248,8 +258,8 @@ public class SearchActivity extends Activity {
                     }
 
                     @Override
-                    public void onFailure(Throwable t) {
-                        hideLoading();
+                    public void onFailure(Call<ListSongResponse> call, Throwable t) {
+
                     }
                 });
                 return true;
@@ -257,8 +267,6 @@ public class SearchActivity extends Activity {
 
             @Override
             public boolean onQueryTextChange(String query) {
-                if (TextUtils.isEmpty(query)) {
-                }
                 return true;
             }
         });

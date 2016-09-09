@@ -16,6 +16,7 @@
     <string name="search">Tìm </string>
     <string name="search_hint">Nhập tên bài hát</string>
     <string name="no_name">No name</string>
-    <string name="no_search_results">No results for\n“%1$s”</string>
+    <string name="no_song_info">Không tìm được bài hát! Vui lòng thử lại sau.</string>
+    <string name="no_search_results">Không tìm thấy \n“%1$s”</string>
 
 </resources>

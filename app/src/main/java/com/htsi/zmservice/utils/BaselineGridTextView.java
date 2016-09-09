@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.htsi.zmservice;
+package com.htsi.zmservice.utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+
+import com.htsi.zmservice.R;
+import com.htsi.zmservice.ui.view.FontTextView;
 
 /**
  * An extension to {@link android.widget.TextView} which aligns text to a 4dp baseline grid.

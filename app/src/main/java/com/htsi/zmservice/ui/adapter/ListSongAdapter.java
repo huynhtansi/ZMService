@@ -1,4 +1,4 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.ui.adapter;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -8,10 +8,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.htsi.zmservice.R;
+import com.htsi.zmservice.models.SongInfo;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -65,9 +67,9 @@ public class ListSongAdapter extends BaseAdapter {
     }
 
     class SongHolder {
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView mTextTitle;
-        @Bind(R.id.artist)
+        @BindView(R.id.artist)
         TextView mTextArtist;
 
         public SongHolder(View pView) {

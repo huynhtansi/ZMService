@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.htsi.zmservice;
+package com.htsi.zmservice.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import com.htsi.zmservice.R;
+import com.htsi.zmservice.utils.FontUtil;
 
 /**
  * Extension to TextView that adds support for custom fonts.

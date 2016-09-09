@@ -1,9 +1,10 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.service;
 
-import com.squareup.okhttp.OkHttpClient;
 
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 
 /**
  * Created by htsi.
@@ -12,10 +13,8 @@ import retrofit.Retrofit;
  */
 public class ServiceGenerator {
 
-    private static final String API_BASE_URL = "http://api.mp3.zing.vn";
-
     public static final String IMAGE_BASE_URL = "http://image.mp3.zdn.vn/";
-
+    private static final String API_BASE_URL = "http://api.mp3.zing.vn";
     private static final String API_BASE_URL_SEARCH  = "http://ac.mp3.zing.vn";
 
     private static OkHttpClient okHttpClient = new OkHttpClient();

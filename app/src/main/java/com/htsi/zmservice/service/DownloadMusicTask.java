@@ -1,4 +1,4 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.service;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -6,6 +6,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.Toast;
+
+import com.htsi.zmservice.R;
 
 import java.io.BufferedInputStream;
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.utils;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;

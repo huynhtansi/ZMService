@@ -1,6 +1,7 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.models.response;
 
 import com.google.gson.annotations.SerializedName;
+import com.htsi.zmservice.models.SongInfo;
 
 import java.util.List;
 
@@ -13,13 +14,12 @@ public class ListSongResponse {
 
     @SerializedName("result")
     private String mResult;
+    @SerializedName("data")
+    private List<TypeSong> mTypeSongs;
 
     public String getResult() {
         return mResult;
     }
-
-    @SerializedName("data")
-    private List<TypeSong> mTypeSongs;
 
     public List<TypeSong> getTypeSongs() {
         return mTypeSongs;

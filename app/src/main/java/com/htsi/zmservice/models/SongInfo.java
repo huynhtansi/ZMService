@@ -1,4 +1,5 @@
-package com.htsi.zmservice;
+package com.htsi.zmservice.models;
+
 
 import com.google.gson.annotations.SerializedName;
 

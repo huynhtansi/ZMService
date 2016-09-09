@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.htsi.zmservice;
+package com.htsi.zmservice.utils;
 
 import android.animation.Animator;
 import android.animation.TimeInterpolator;
@@ -32,11 +32,12 @@ import java.util.ArrayList;
  */
 public class AnimUtils {
 
-    private AnimUtils() { }
-
     private static Interpolator fastOutSlowIn;
     private static Interpolator fastOutLinearIn;
     private static Interpolator linearOutSlowIn;
+
+    private AnimUtils() {
+    }
 
     public static Interpolator getFastOutSlowInInterpolator(Context context) {
         if (fastOutSlowIn == null) {
@@ -121,7 +122,7 @@ public class AnimUtils {
 
         @Override
         final public void set(T object, Integer value) {
-            setValue(object, value.intValue());
+            setValue(object, value);
         }
 
     }
@@ -135,7 +136,7 @@ public class AnimUtils {
     public static class NoPauseAnimator extends Animator {
         private final Animator mAnimator;
         private final ArrayMap<AnimatorListener, AnimatorListener> mListeners =
-                new ArrayMap<AnimatorListener, AnimatorListener>();
+                new ArrayMap<>();
 
         public NoPauseAnimator(Animator animator) {
             mAnimator = animator;
@@ -177,7 +178,7 @@ public class AnimUtils {
 
         @Override
         public ArrayList<AnimatorListener> getListeners() {
-            return new ArrayList<AnimatorListener>(mListeners.keySet());
+            return new ArrayList<>(mListeners.keySet());
         }
 
         @Override
